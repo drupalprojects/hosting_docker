@@ -1,0 +1,29 @@
+<?php
+/**
+ * @file
+ * Web server node type is defined here.
+ */
+
+/**
+ * Implements hook_hosting_service().
+ */
+function hosting_docker_server_hosting_service() {
+  return array(
+    'apache_docker' => 'http',
+    'mysql_docker' => 'db',
+  );
+}
+
+/**
+ * Implements hook_hosting_service_type()
+ *
+ * @TODO: After we get a web and DB container work on generic docker containers.
+ */
+function hosting_docker_server_hosting_service_type() {
+  return array(
+    'docker' => array(
+      'title' => t('Docker'),
+    ),
+  );
+}
+

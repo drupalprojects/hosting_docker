@@ -1,0 +1,7 @@
+name = Docker Servers
+description = Allow hostmaster to deploy docker servers.
+package = Hosting
+dependencies[] = hosting
+
+core = 7.x
+files[] = hosting_docker_server.service.inc
