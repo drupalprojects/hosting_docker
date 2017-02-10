@@ -21,15 +21,34 @@ class Provision_Config_Apache_Docker_Compose extends Provision_Config {
    */
   function __construct($context, $data = array())
   {
+    $data['compose'] = $this->getDockerCompose();
+    $data['server_name'] = ltrim($this->data['server']->name, '@server_');
     parent::__construct($context, $data);
-    $this->data['compose'] = $this->getDockerCompose();
   }
   
   function getDockerCompose() {
-    $server_name = trim(d()->name, '@');
+    $server_name = ltrim(d()->name, '@server_');
     $port = d()->http_port;
-     $compose = array(
-      'http' => array(
+    $compose = array();
+     
+    // Web Server
+    if (d()->service('http')->docker_service) {
+      $compose['http'] = array(
+        'image'  => d()->service('http')->docker_image,
+        'hostname'  => $server_name,
+        'restart'  => 'on-failure:10',
+        'ports'  => array(
+          "{$port}:80"
+        ),
+        'volumes' => $this->getVolumes(),
+        'environment' => $this->getEnvironment()
+      );
+    }
+  
+  
+    // Web Server
+    if (d()->service('http')->docker_service) {
+      $compose['http'] = array(
         'image'  => 'aegir/web',
         'hostname'  => $server_name,
         'restart'  => 'on-failure:10',
@@ -40,9 +59,10 @@ class Provision_Config_Apache_Docker_Compose extends Provision_Config {
         'environment' => array(
           'AEGIR_SERVER_NAME' => $server_name,
         ),
-      ),
-    );
-     return $compose;
+      );
+    }
+  
+    return $compose;
   }
   
   /**
@@ -75,6 +95,23 @@ class Provision_Config_Apache_Docker_Compose extends Provision_Config {
     $volumes[] = "{$platforms_path_host}:{$platforms_path_container}:z";
     
     return $volumes;
+  }
+  
+  /**
+   * Load environment variables for this server.
+   * @return array
+   */
+  function getEnvironment() {
+    $environment = array();
+    $environment['AEGIR_SERVER_NAME'] = ltrim(d()->name, '@server_');
+    
+    if (d()->service('http')->docker_service) {
+      $environment = array_merge($environment, d()->service('http')->environment());
+    }
+    if (d()->service('db')->docker_service) {
+      $environment = array_merge($environment, d()->service('db')->environment());
+    }
+    return $environment;
   }
   
   /**

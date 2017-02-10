@@ -10,6 +10,9 @@ class Provision_Service_http_apache_docker extends Provision_Service_http_apache
   protected $application_name = 'docker';
   protected $has_restart_cmd = TRUE;
   
+  public $docker_service = TRUE;
+  public $docker_image = 'aegir/web';
+  
   /**
    * This is passed to the `docker run` command. If you leave it blank, a random port will be assigned by docker, as we will save it.
    * @return string
@@ -19,15 +22,23 @@ class Provision_Service_http_apache_docker extends Provision_Service_http_apache
   }
   
   function verify_server_cmd() {
+    drush_log('verify_server_cmd', 'devshop_log');
     parent::verify_server_cmd();
     drush_log("Running docker-compose in " . $this->server->config_path, "ok");
     drush_shell_cd_and_exec($this->server->config_path, "docker-compose up -d");
+  }
+  
+  function environment() {
+    return array(
+      'AEGIR_DOCKER' => 1,
+    );
   }
   
   /**
    * Prepare the server context, config files, etc.
    */
   function init_server() {
+    drush_log('init_server', 'devshop_log');
     
     // This loads the Apache Config files, which we are going to use inside the container.
     parent::init_server();
