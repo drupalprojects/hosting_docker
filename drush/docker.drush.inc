@@ -1,5 +1,7 @@
 <?php
 
+require_once('vendor/autoload.php');
+
 /**
  * Register our directory as a place to find provision classes.
  */
