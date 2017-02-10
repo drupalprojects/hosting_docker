@@ -20,15 +20,8 @@ class Provision_Service_http_apache_docker extends Provision_Service_http_apache
   
   function verify_server_cmd() {
     parent::verify_server_cmd();
-    
-    $this->container_name = ltrim($this->server->name, '@');
-    
-    drush_log('Verifying container ' .$this->container_name, 'warning');
-    
-    $command = "docker run --name {$this->container_name} --hostname {$this->container_name} --restart=on-failure:10 -d -p {$this->server->http_port}:80 -v {$this->server->config_path}:{$this->server->config_path} -e AEGIR_SERVER_NAME={$this->container_name} aegir/web";
-
-    drush_log('Verify Server: Docker Command: '. $command, 'devshop_log');
-  
+    drush_log("Running docker-compose in " . $this->server->config_path, "ok");
+    drush_shell_cd_and_exec($this->server->config_path, "docker-compose up -d");
   }
   
   /**
@@ -41,6 +34,10 @@ class Provision_Service_http_apache_docker extends Provision_Service_http_apache
     
     // If a server is set to use Docker, set remote_host to localhost. This prevents RSYNC and SSH commands from running "remotely".a
     $this->server->remote_host = 'localhost';
+  
+    // Include the Provision_Config_Apache_Docker_Compose class to write docker-compose.yml.
+    $this->configs['server'][] = 'Provision_Config_Apache_Docker_Compose';
+  
   }
   
   function symlink_service()
