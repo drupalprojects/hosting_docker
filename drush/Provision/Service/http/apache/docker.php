@@ -38,8 +38,6 @@ class Provision_Service_http_apache_docker extends Provision_Service_http_apache
    * Prepare the server context, config files, etc.
    */
   function init_server() {
-    drush_log('init_server', 'devshop_log');
-    
     // This loads the Apache Config files, which we are going to use inside the container.
     parent::init_server();
     
