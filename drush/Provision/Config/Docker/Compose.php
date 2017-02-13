@@ -39,6 +39,14 @@ class Provision_Config_Docker_Compose extends Provision_Config
         $compose[$service]['hostname'] = "{$server_name}.{$service}";
       }
     }
+    
+    // For now, link every service. to http
+    foreach ($compose as $service => $data) {
+      if ($service != 'http') {
+        $compose['http']['links'][] = $service;
+      }
+    }
+    
     return $compose;
   }
   
