@@ -41,9 +41,11 @@ class Provision_Config_Docker_Compose extends Provision_Config
     }
     
     // For now, link every service. to http
-    foreach ($compose as $service => $data) {
-      if ($service != 'http') {
-        $compose['http']['links'][] = $service;
+    if (isset($compose['http'])) {
+      foreach ($compose as $service => $data) {
+        if ($service != 'http') {
+          $compose['http']['links'][] = $service;
+        }
       }
     }
     
