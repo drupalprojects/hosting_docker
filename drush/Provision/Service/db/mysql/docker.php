@@ -37,12 +37,12 @@ class Provision_Service_db_mysql_docker extends Provision_Service_db_mysql {
   }
 
   function dockerComposeService() {
-    $port = d()->db_port;
+    $ports = empty(d()->db_port)? '3306': d()->db_port . ':3306' ;
     $compose = array(
       'image'  => $this->docker_image,
       'restart'  => 'on-failure:10',
       'ports'  => array(
-        "{$port}:3306"
+        $ports,
       ),
       'environment' => $this->environment(),
       

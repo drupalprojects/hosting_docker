@@ -38,13 +38,13 @@ class Provision_Service_http_apache_docker extends Provision_Service_http_apache
   }
   
   function dockerComposeService() {
-    $port = d()->http_port;
+    $ports = empty(d()->http_port)? '80': d()->http_port . ':80' ;
   
     $compose = array(
         'image'  => $this->docker_image,
         'restart'  => 'on-failure:10',
         'ports'  => array(
-          "{$port}:80"
+          $ports,
         ),
         'volumes' => $this->getVolumes(),
         'environment' => $this->getEnvironment()
