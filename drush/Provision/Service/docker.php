@@ -25,9 +25,9 @@ class Provision_Service_docker_compose extends Provision_Service_docker {
   }
   
   /**
-   * Called on provision-verify for servers.
+   * Called before provision-verify for servers.  Invoked by drush_docker_pre_provision_verify();
    */
-  function verify_server_cmd()
+  function pre_verify_server_cmd()
   {
 
     // Write docker-compose.yml file.
@@ -35,7 +35,7 @@ class Provision_Service_docker_compose extends Provision_Service_docker {
     $config->write();
 
     // Run docker-compose up -d
-    drush_log("Running docker-compose in " . $this->server->config_path, "ok");
+    drush_log("Running docker-compose in " . $this->server->config_path, "devshop_log");
     drush_shell_cd_and_exec($this->server->config_path, "docker-compose up -d");
   }
 }
