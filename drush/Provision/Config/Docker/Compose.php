@@ -5,12 +5,14 @@ use Symfony\Component\Yaml\Yaml;
 /**
  * Docker-compose.yml file generator for an Aegir Server.
  */
-class Provision_Config_Apache_Docker_Compose extends Provision_Config {
+class Provision_Config_Docker_Compose extends Provision_Config
+{
   public $template = '';
   public $description = 'docker compose YML for this server.';
   
-  function filename() {
-    return $this->data['server']->config_path . '/docker-compose.yml';
+  function filename()
+  {
+    return d()->docker_compose_path;
   }
   
   /**
@@ -26,92 +28,18 @@ class Provision_Config_Apache_Docker_Compose extends Provision_Config {
     parent::__construct($context, $data);
   }
   
-  function getDockerCompose() {
+  function getDockerCompose()
+  {
     $server_name = ltrim(d()->name, '@server_');
-    $port = d()->http_port;
     $compose = array();
-     
-    // Web Server
-    if (d()->service('http')->docker_service) {
-      $compose['http'] = array(
-        'image'  => d()->service('http')->docker_image,
-        'hostname'  => $server_name,
-        'restart'  => 'on-failure:10',
-        'ports'  => array(
-          "{$port}:80"
-        ),
-        'volumes' => $this->getVolumes(),
-        'environment' => $this->getEnvironment()
-      );
+    
+    foreach (d()->get_services() as $service => $server) {
+      if (method_exists(d()->service($service), 'dockerComposeService')) {
+        $compose[$service] = d()->service($service)->dockerComposeService();
+        $compose[$service]['hostname'] = "{$server_name}.{$service}";
+      }
     }
-  
-  
-    // Web Server
-    if (d()->service('http')->docker_service) {
-      $compose['http'] = array(
-        'image'  => 'aegir/web',
-        'hostname'  => $server_name,
-        'restart'  => 'on-failure:10',
-        'ports'  => array(
-          "{$port}:80"
-        ),
-        'volumes' => $this->getVolumes(),
-        'environment' => array(
-          'AEGIR_SERVER_NAME' => $server_name,
-        ),
-      );
-    }
-  
     return $compose;
-  }
-  
-  /**
-   * Return all volumes for this server.
-   *
-   * @TODO: Invoke an alter hook of some kinds to allow additional volumes and volume flags.
-   *
-   * To allow Aegir inside a container to properly launch other containers with mapped volumes, set an environment variable on your aegir/hostmaster container:
-   *
-   *   HOST_AEGIR_HOME=/home/you/Projects/aegir/aegir-home
-   *
-   * @return array
-   */
-  function getVolumes() {
-    $volumes = array();
-    
-    $config_path_host = $config_path_container = d()->config_path;
-    $platforms_path_host = $platforms_path_container = d()->http_platforms_path;
-    
-    if (isset($_SERVER['HOST_AEGIR_HOME'])) {
-      $config_path_host = strtr($config_path_host, array(
-        '/var/aegir' => $_SERVER['HOST_AEGIR_HOME']
-      ));
-      $platforms_path_host = strtr($platforms_path_host, array(
-        '/var/aegir' => $_SERVER['HOST_AEGIR_HOME']
-      ));
-    }
-    
-    $volumes[] = "{$config_path_host}:{$config_path_container}:z";
-    $volumes[] = "{$platforms_path_host}:{$platforms_path_container}:z";
-    
-    return $volumes;
-  }
-  
-  /**
-   * Load environment variables for this server.
-   * @return array
-   */
-  function getEnvironment() {
-    $environment = array();
-    $environment['AEGIR_SERVER_NAME'] = ltrim(d()->name, '@server_');
-    
-    if (d()->service('http')->docker_service) {
-      $environment = array_merge($environment, d()->service('http')->environment());
-    }
-    if (d()->service('db')->docker_service) {
-      $environment = array_merge($environment, d()->service('db')->environment());
-    }
-    return $environment;
   }
   
   /**
@@ -120,6 +48,8 @@ class Provision_Config_Apache_Docker_Compose extends Provision_Config {
    * @return bool
    */
   function write() {
+    drush_log('WRTIE>>>>>>>>>>>>', 'warning');
+    drush_log('data>>>>>>>>>>>>' . print_r($this->data, 1), 'warning');
     $filename = $this->filename();
     // Make directory structure if it does not exist.
     if ($filename && !provision_file()->exists(dirname($filename))->status()) {

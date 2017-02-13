@@ -22,10 +22,6 @@ class Provision_Service_http_apache_docker extends Provision_Service_http_apache
   }
   
   function verify_server_cmd() {
-    drush_log('verify_server_cmd', 'devshop_log');
-    parent::verify_server_cmd();
-    drush_log("Running docker-compose in " . $this->server->config_path, "ok");
-    drush_shell_cd_and_exec($this->server->config_path, "docker-compose up -d");
   }
   
   function environment() {
@@ -34,20 +30,6 @@ class Provision_Service_http_apache_docker extends Provision_Service_http_apache
     );
   }
   
-  /**
-   * Prepare the server context, config files, etc.
-   */
-  function init_server() {
-    // This loads the Apache Config files, which we are going to use inside the container.
-    parent::init_server();
-    
-    // If a server is set to use Docker, set remote_host to localhost. This prevents RSYNC and SSH commands from running "remotely".a
-    $this->server->remote_host = 'localhost';
-  
-    // Include the Provision_Config_Apache_Docker_Compose class to write docker-compose.yml.
-    $this->configs['server'][] = 'Provision_Config_Apache_Docker_Compose';
-  
-  }
   
   function symlink_service()
   {
@@ -55,10 +37,68 @@ class Provision_Service_http_apache_docker extends Provision_Service_http_apache
     // parent::symlink_service();
   }
   
-  /**
-   * Restart apache to pick up the new config files.
-   */
-  function parse_configs() {
-    return $this->restart();
+  function dockerComposeService() {
+    $port = d()->http_port;
+  
+    $compose = array(
+        'image'  => $this->docker_image,
+        'restart'  => 'on-failure:10',
+        'ports'  => array(
+          "{$port}:80"
+        ),
+        'volumes' => $this->getVolumes(),
+        'environment' => $this->getEnvironment()
+      );
+    return $compose;
   }
+  
+  /**
+   * Return all volumes for this server.
+   *
+   * @TODO: Invoke an alter hook of some kinds to allow additional volumes and volume flags.
+   *
+   * To allow Aegir inside a container to properly launch other containers with mapped volumes, set an environment variable on your aegir/hostmaster container:
+   *
+   *   HOST_AEGIR_HOME=/home/you/Projects/aegir/aegir-home
+   *
+   * @return array
+   */
+  function getVolumes() {
+    $volumes = array();
+    
+    $config_path_host = $config_path_container = d()->config_path;
+    $platforms_path_host = $platforms_path_container = d()->http_platforms_path;
+    
+    if (isset($_SERVER['HOST_AEGIR_HOME'])) {
+      $config_path_host = strtr($config_path_host, array(
+        '/var/aegir' => $_SERVER['HOST_AEGIR_HOME']
+      ));
+      $platforms_path_host = strtr($platforms_path_host, array(
+        '/var/aegir' => $_SERVER['HOST_AEGIR_HOME']
+      ));
+    }
+    
+    $volumes[] = "{$config_path_host}:{$config_path_container}:z";
+    $volumes[] = "{$platforms_path_host}:{$platforms_path_container}:z";
+    
+    return $volumes;
+  }
+  
+  /**
+   * Load environment variables for this server.
+   * @return array
+   */
+  function getEnvironment() {
+    $environment = array();
+    $environment['AEGIR_SERVER_NAME'] = ltrim(d()->name, '@server_');
+    
+    if (d()->service('http')->docker_service) {
+      $environment = array_merge($environment, d()->service('http')->environment());
+    }
+    if (d()->service('db')->docker_service) {
+      $environment = array_merge($environment, d()->service('db')->environment());
+    }
+    return $environment;
+  }
+  
 }

@@ -19,3 +19,13 @@ function docker_register_autoload() {
 function docker_drush_init() {
   docker_register_autoload();
 }
+
+/**
+ * Implements hook_provision_services().
+ */
+function docker_provision_services() {
+  docker_register_autoload();
+  return array(
+    'docker' => 'compose',
+  );
+}
