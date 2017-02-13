@@ -15,7 +15,8 @@ class Provision_Service_db_mysql_docker extends Provision_Service_db_mysql {
   
   function environment() {
     return array(
-      'MYSQL_ROOT_USER' => $this->creds['user'],
+      // MariaDB image does not have a MYSQL_ROOT_USER environment variable.
+      // 'MYSQL_ROOT_USER' => 'root',
       'MYSQL_ROOT_PASSWORD' => $this->creds['pass'],
     );
   }
