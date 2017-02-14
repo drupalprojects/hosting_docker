@@ -10,6 +10,7 @@ class ComposerStaticInit39a4171768321eabf3da43ffd02c039a
         'S' => 
         array (
             'Symfony\\Component\\Yaml\\' => 23,
+            'Symfony\\Component\\Process\\' => 26,
         ),
     );
 
@@ -17,6 +18,10 @@ class ComposerStaticInit39a4171768321eabf3da43ffd02c039a
         'Symfony\\Component\\Yaml\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/yaml',
+        ),
+        'Symfony\\Component\\Process\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/process',
         ),
     );
 
