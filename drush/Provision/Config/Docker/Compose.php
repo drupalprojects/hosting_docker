@@ -58,8 +58,6 @@ class Provision_Config_Docker_Compose extends Provision_Config
    * @return bool
    */
   function write() {
-    drush_log('WRTIE>>>>>>>>>>>>', 'warning');
-    drush_log('data>>>>>>>>>>>>' . print_r($this->data, 1), 'warning');
     $filename = $this->filename();
     // Make directory structure if it does not exist.
     if ($filename && !provision_file()->exists(dirname($filename))->status()) {
