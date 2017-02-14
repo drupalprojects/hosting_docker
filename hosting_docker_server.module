@@ -27,3 +27,16 @@ function hosting_docker_server_hosting_service_type() {
   );
 }
 
+/**
+ * Implements hook_form_alter().
+ */
+function hosting_docker_server_form_hosting_settings_alter(&$form, &$form_state, $form_id)
+{
+  $form['hostmaster_container_id'] = array(
+    '#title' => t('Docker Container ID of the Hostmaster web container'),
+    '#description' => t('In order for Aegir to connect to database servers, it needs to be in the same network. Enter the container ID of this hostmaster\'s web container so that we can add it to the networks created for each server node that enables docker services. To find the container ID, run <code>docker ps</code> and look for the aegir/hostmaster image.'),
+    '#type' => 'textfield',
+    '#default_value' => variable_get('hostmaster_container_id', ''),
+  );
+  
+}
