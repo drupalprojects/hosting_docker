@@ -9,9 +9,20 @@
  */
 class Provision_Service_db_mysql_docker extends Provision_Service_db_mysql {
   protected $application_name = 'docker';
+  private $dsn;
   
   public $docker_service = TRUE;
   public $docker_image = 'mariadb';
+  
+  
+  function init_server() {
+    parent::init_server();
+    $this->dsn = sprintf("%s:host=%s", $this->PDO_type,  'localhost');
+    
+    if ($this->has_port) {
+      $this->dsn = "{$this->dsn};port={$this->server->db_port}";
+    }
+  }
   
   function environment() {
     return array(
