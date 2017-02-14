@@ -40,7 +40,20 @@ class Provision_Service_docker_compose extends Provision_Service_docker {
     // If hostmaster container is known, add it to the network.
     if ($container_id = drush_get_option('hostmaster_container_id')) {
       $container_prefix = preg_replace("/[^A-Za-z0-9 ]/", '', $this->server->name);
-      $this->runProcess("docker network connect {$container_prefix}_default {$container_id}", d()->config_path);
+      $container_name = "{$container_prefix}_db_1";
+      $network_name = "{$container_prefix}_default";
+      
+      // Check if container is already on the network.
+      $host = gethostbyname($container_name);
+      if ($host && $host != $container_name) {
+        drush_log(dt('Connected to database container (!host) from hostmaster.', array(
+          '!host' => $host,
+        )), 'ok');
+      }
+      // If not, add it to the network!
+      else {
+        $this->runProcess("docker network connect {$network_name} {$container_id}", d()->config_path);
+      }
     }
     else {
       return drush_set_error('DOCKER_MISSING_HOSTMASTER_CONTAINER_ID', dt('The container ID for hostmaster is unknown. Check Hosting Settings.'));
