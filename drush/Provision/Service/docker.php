@@ -15,11 +15,13 @@ class Provision_Service_docker_compose extends Provision_Service_docker {
     parent::init_server();
     
     // Detect if this server is using any docker services, then we load the config file.
-    foreach (d()->get_services() as $service_name => $server) {
-      if (isset(d()->service($service_name)->docker_service) && d()->service($service_name)->docker_service) {
-        $this->server->remote_host = 'localhost';
-        $this->server->setProperty('docker_compose_path', d()->config_path . '/docker-compose.yml');
-        break;
+    if (d()->type == 'server') {
+      foreach (d()->get_services() as $service_name => $server) {
+        if (isset(d()->service($service_name)->docker_service) && d()->service($service_name)->docker_service) {
+          $this->server->remote_host = 'localhost';
+          $this->server->setProperty('docker_compose_path', d()->config_path . '/docker-compose.yml');
+          break;
+        }
       }
     }
   }
