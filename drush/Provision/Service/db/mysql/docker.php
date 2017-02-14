@@ -28,6 +28,11 @@ class Provision_Service_db_mysql_docker extends Provision_Service_db_mysql {
       return;
     }
     
+    // If current context is a site, set host to "db"
+    if (d()->type == 'site') {
+      return parent::connect();
+    }
+    
     // User is always root in mysql containers.
     $user = 'root';
     
