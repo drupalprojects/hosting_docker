@@ -119,4 +119,9 @@ class Provision_Service_db_mysql_docker extends Provision_Service_db_mysql {
     }
   }
   
+  function generate_site_credentials() {
+    $creds = parent::generate_site_credentials();
+    $creds['db_host'] = drush_set_option('db_host', 'db', 'site');
+    return $creds;
+  }
 }
