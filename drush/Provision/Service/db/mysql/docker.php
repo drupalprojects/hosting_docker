@@ -58,7 +58,7 @@ class Provision_Service_db_mysql_docker extends Provision_Service_db_mysql {
       drush_log($output, 'devshop_log');
       sleep(3);
     }
-    drush_log('Database container ready!', 'devshop_log');
+    drush_log('Database container ready.', 'devshop_log');
   }
 
   function dockerComposeService() {
