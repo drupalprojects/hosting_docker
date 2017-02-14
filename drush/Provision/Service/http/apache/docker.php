@@ -22,6 +22,7 @@ class Provision_Service_http_apache_docker extends Provision_Service_http_apache
   }
   
   function verify_server_cmd() {
+    parent::verify_server_cmd();
   }
   
   function environment() {
