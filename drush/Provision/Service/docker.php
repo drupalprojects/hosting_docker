@@ -39,6 +39,16 @@ class Provision_Service_docker_compose extends Provision_Service_docker {
   }
   
   /**
+   * Called before provision-verify for servers.  Invoked by drush_docker_pre_provision_verify();
+   */
+  function pre_delete_server_cmd()
+  {
+    // Run docker-compose kill; docker-compose rm -fv
+    $this->runProcess('docker-compose kill', d()->config_path);
+    $this->runProcess('docker-compose rm -fv', d()->config_path);
+  }
+  
+  /**
    * Run a process while logging the output to drush in real time.
    *
    * @param $command

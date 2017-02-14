@@ -43,6 +43,18 @@ function drush_docker_pre_provision_verify () {
 }
 
 /**
+ * Implements drush_hook_pre_COMMAND()
+ * Run pre-verify on the docker compose service.
+ */
+function drush_docker_pre_provision_delete () {
+  
+  if (d()->type == 'server' && _server_has_docker_services()) {
+    $service = new Provision_Service_docker_compose(d());
+    $service->pre_delete_server_cmd();
+  }
+}
+
+/**
  * Loop through get_services() to see if any of them ar docker services.
  */
 function _server_has_docker_services() {
