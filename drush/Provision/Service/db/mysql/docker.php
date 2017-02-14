@@ -61,7 +61,7 @@ class Provision_Service_db_mysql_docker extends Provision_Service_db_mysql {
       drush_log('Waiting for DB container...', 'devshop_log');
       drush_shell_cd_and_exec(d()->config_path, $cmd);
       $output = trim(implode("\n", drush_shell_exec_output()));
-      drush_log($output, 'devshop_log');
+      drush_log($output, 'debug');
     }
     drush_log('Database container ready.', 'devshop_log');
   }
