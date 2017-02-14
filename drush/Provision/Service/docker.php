@@ -36,6 +36,15 @@ class Provision_Service_docker_compose extends Provision_Service_docker {
     // Run docker-compose up -d
     drush_log("Running docker-compose in " . d()->config_path, "devshop_log");
     $this->runProcess('docker-compose up -d', d()->config_path);
+    
+    // If hostmaster container is known, add it to the network.
+    if ($container_id = drush_get_option('hostmaster_container_id')) {
+      $container_prefix = preg_replace("/[^A-Za-z0-9 ]/", '', $this->server->name);
+      $this->runProcess("docker network connect {$container_prefix}_default {$container_id}", d()->config_path);
+    }
+    else {
+      return drush_set_error('DOCKER_MISSING_HOSTMASTER_CONTAINER_ID', dt('The container ID for hostmaster is unknown. Check Hosting Settings.'));
+    }
   }
   
   /**
