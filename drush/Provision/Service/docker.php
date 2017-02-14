@@ -46,6 +46,10 @@ class Provision_Service_docker_compose extends Provision_Service_docker {
     // Run docker-compose kill; docker-compose rm -fv
     $this->runProcess('docker-compose kill', d()->config_path);
     $this->runProcess('docker-compose rm -fv', d()->config_path);
+    
+    // Delete the docker-compose.yml file.
+    $config = new Provision_Config_Docker_Compose(d());
+    $config->unlink();
   }
   
   /**
