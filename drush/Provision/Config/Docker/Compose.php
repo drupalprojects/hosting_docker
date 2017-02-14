@@ -31,20 +31,22 @@ class Provision_Config_Docker_Compose extends Provision_Config
   function getDockerCompose()
   {
     $server_name = ltrim(d()->name, '@server_');
-    $compose = array();
+    $compose = array(
+      'version' => '2',
+    );
     
     foreach (d()->get_services() as $service => $server) {
       if (method_exists(d()->service($service), 'dockerComposeService')) {
-        $compose[$service] = d()->service($service)->dockerComposeService();
-        $compose[$service]['hostname'] = "{$server_name}.{$service}";
+        $compose['services'][$service] = d()->service($service)->dockerComposeService();
+        $compose['services'][$service]['hostname'] = "{$server_name}.{$service}";
       }
     }
     
     // For now, link every service. to http
-    if (isset($compose['http'])) {
-      foreach ($compose as $service => $data) {
+    if (isset($compose['services']['http'])) {
+      foreach ($compose['services'] as $service => $data) {
         if ($service != 'http') {
-          $compose['http']['links'][] = $service;
+          $compose['services']['http']['links'][] = $service;
         }
       }
     }
