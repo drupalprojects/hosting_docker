@@ -29,7 +29,6 @@ class Provision_Service_docker_compose extends Provision_Service_docker {
    */
   function pre_verify_server_cmd()
   {
-
     // Write docker-compose.yml file.
     $config = new Provision_Config_Docker_Compose(d());
     $config->write();
