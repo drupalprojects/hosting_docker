@@ -38,7 +38,27 @@ class Provision_Service_db_mysql_docker extends Provision_Service_db_mysql {
       return;
     }
     
-    parent::connect();
+    // User is always root in mysql containers.
+    $user = 'root';
+    
+    // Root password
+    $password = $this->creds['pass'];
+    
+    // Host is always db (this service type) when using docker compose.
+    $host = 'db';
+    
+    // Find the container prefix by removing all non-alphanumeric characters
+    $container_prefix = preg_replace("/[^A-Za-z0-9 ]/", '', $this->server->name);
+    
+    $output = '';
+    while (strpos($output, 'mysqld is alive') === FALSE) {
+      drush_log('Waiting for DB container...', 'devshop_log');
+      drush_shell_cd_and_exec(d()->config_path, "docker exec {$container_prefix}_http_1 mysqladmin ping -h {$host} -u {$user} --password={$password}");
+      $output = trim(implode("\n", drush_shell_exec_output()));
+      drush_log($output, 'devshop_log');
+      sleep(3);
+    }
+    drush_log('Database container ready!', 'devshop_log');
   }
 
   function dockerComposeService() {
