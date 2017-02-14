@@ -32,19 +32,13 @@ class Provision_Service_db_mysql_docker extends Provision_Service_db_mysql {
     );
   }
   
-  
   function connect() {
+    $context = drush_get_context('command');
+    if ($context['command'] == 'provision-save') {
+      return;
+    }
     
-    drush_log('CONNECTED!', 'devshop_log');
-//    $user = isset($this->creds['user']) ? $this->creds['user'] : '';
-//    $pass = isset($this->creds['pass']) ? $this->creds['pass'] : '';
-//    try {
-//      $this->conn = new PDO($this->dsn, $user, $pass);
-//      return $this->conn;
-//    }
-//    catch (PDOException $e) {
-//      return drush_set_error('PROVISION_DB_CONNECT_FAIL', $e->getMessage());
-//    }
+    parent::connect();
   }
 
   function dockerComposeService() {
