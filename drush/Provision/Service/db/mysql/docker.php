@@ -89,12 +89,25 @@ class Provision_Service_db_mysql_docker extends Provision_Service_db_mysql {
    */
   function grant_host(Provision_Context_server $server) {
     $container_prefix = preg_replace("/[^A-Za-z0-9 ]/", '', $this->server->name);
-    $container_name = "{$container_prefix}_http_1";
-  
-    $command = sprintf('docker exec %s mysql -u intntnllyInvalid -h %s -P %s -e "SELECT VERSION()"',
-      $container_name,
-      escapeshellarg('db'),
-      escapeshellarg($this->server->db_port));
+    
+    // If we are checking access for server_master, run "mysql" command directly and use the full container name for the DB host.
+    if ($server->name == '@server_master') {
+      $db_host_name = "{$container_prefix}_db_1";
+      $command = sprintf('mysql -u intntnllyInvalid -h %s -P %s -e "SELECT VERSION()"',
+        $db_host_name,
+        escapeshellarg($this->server->db_port));
+    }
+    
+    // If we are checking another server, run from the linked http server.
+    // @TODO: be more generic here.  This assumes that the user selected a web and db docker contaiiner.
+    else {
+      $container_name = "{$container_prefix}_http_1";
+      $db_host_name = 'db';
+      $command = sprintf('docker exec %s mysql -u intntnllyInvalid -h %s -P %s -e "SELECT VERSION()"',
+        $container_name,
+        $db_host_name,
+        escapeshellarg($this->server->db_port));
+    }
     
     $server->shell_exec($command);
     $output = implode('', drush_shell_exec_output());
