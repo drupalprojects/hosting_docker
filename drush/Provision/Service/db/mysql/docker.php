@@ -22,6 +22,14 @@ class Provision_Service_db_mysql_docker extends Provision_Service_db_mysql {
     );
   }
   
+  /**
+   * Needed otherwise Provision_Service_db_mysql will assign 3306 because port "0" looks empty.
+   * @return string
+   */
+  function default_port() {
+    return "";
+  }
+  
   function connect() {
     $context = drush_get_context('command');
     if ($context['command'] == 'provision-save') {
@@ -63,19 +71,22 @@ class Provision_Service_db_mysql_docker extends Provision_Service_db_mysql {
   }
 
   function dockerComposeService() {
-    $ports = empty(d()->db_port)? '3306': d()->db_port . ':3306' ;
     $compose = array(
       'image'  => $this->docker_image,
       'restart'  => 'on-failure:10',
-      'ports'  => array(
-        $ports,
-      ),
       'environment' => $this->environment(),
       
       // Recommended way to enable UTF-8 for Drupal.
       // See https://www.drupal.org/node/2754539
       'command' => 'mysqld --innodb-large-prefix --innodb-file-format=barracuda --innodb-file-per-table',
     );
+    
+    // if the user entered no port, don't add ports array. If we do, a random public port is assigned.
+    // We don't typically want this for db servers.
+    if (!empty(d()->db_port)) {
+      $compose['ports'][] = d()->db_port . ':3306';
+    }
+
     return $compose;
   }
   
