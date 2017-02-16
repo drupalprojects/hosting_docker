@@ -9,7 +9,7 @@ module_load_include('service.inc', 'hosting_db_server');
 
 class hostingService_http_apache_docker extends hostingService_http_apache {
   public $type = 'apache_docker';
-  public $name = 'Apache Docker Container';
+  public $name = 'Apache on Docker';
   
   // It does but we don't let the user edit it.
   public $has_restart_cmd = FALSE;
@@ -34,7 +34,7 @@ class hostingService_http_apache_docker extends hostingService_http_apache {
 }
 class hostingService_db_mysql_docker extends hostingService_db_mysql {
   public $type = 'mysql_docker';
-  public $name = 'MySQL Docker Container';
+  public $name = 'MySQL on Docker';
   public $has_restart_cmd = FALSE;
   
   function validate(&$node, &$form, &$form_state)
