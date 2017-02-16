@@ -66,3 +66,18 @@ function _server_has_docker_services() {
     }
   }
 }
+
+/**
+ * Implements hook_provision_config_variables_alter()
+ *
+ * The vhost template is used inside the container. Always listen on 80.
+ */
+function docker_provision_config_variables_alter(&$variables, $template, $config){
+  
+  // If this is the vhost template and the http service is Docker...
+  if (is_a($config, 'Provision_Config_Apache_Site') && is_a(d()->platform->service('http'), 'Provision_Service_http_apache_docker')) {
+    
+    // Force the listen port to be 80.
+    $variables['http_port'] = '80';
+  }
+}
