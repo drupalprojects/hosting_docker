@@ -11,6 +11,7 @@ function hosting_docker_server_hosting_service() {
   return array(
     'apache_docker' => 'http',
     'mysql_docker' => 'db',
+    'varnish' => 'cache',
   );
 }
 
@@ -19,13 +20,13 @@ function hosting_docker_server_hosting_service() {
  *
  * @TODO: After we get a web and DB container work on generic docker containers.
  */
-//function hosting_docker_server_hosting_service_type() {
-//  return array(
-//    'docker' => array(
-//      'title' => t('Docker'),
-//    ),
-//  );
-//}
+function hosting_docker_server_hosting_service_type() {
+  return array(
+    'cache' => array(
+      'title' => t('Cache'),
+    ),
+  );
+}
 
 /**
  * Implements hook_form_alter().

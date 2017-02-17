@@ -7,6 +7,14 @@ class Provision_Service_docker extends Provision_Service
 {
 }
 
+/**
+ * The Varnish Cache provision service.
+ */
+class Provision_Service_cache extends Provision_Service
+{
+}
+
+
 class Provision_Service_docker_compose extends Provision_Service_docker {
   public $service = 'docker';
   

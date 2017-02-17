@@ -27,6 +27,7 @@ function docker_provision_services() {
   docker_register_autoload();
   return array(
     'docker' => 'compose',
+    'cache' => 'varnish',
   );
 }
 

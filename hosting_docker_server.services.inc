@@ -70,3 +70,19 @@ class hostingService_db_mysql_docker extends hostingService_db_mysql {
     $task->context_options['master_db'] = 'mysql' . '://' . urlencode($this->db_user) . ':' . urlencode($this->db_passwd) . '@' . $container_name;
   }
 }
+
+
+class hostingService_cache extends hostingService {
+  public $service = 'cache';
+}
+
+class hostingService_cache_varnish extends hostingService_cache {
+  protected $has_port = TRUE;
+  public $name = 'Varnish';
+  public $type = 'varnish';
+  
+  
+  function default_port() {
+    return 80;
+  }
+}
