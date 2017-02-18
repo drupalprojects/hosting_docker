@@ -8,9 +8,16 @@ class Provision_Service_docker extends Provision_Service
 }
 
 /**
- * The Varnish Cache provision service.
+ *
  */
 class Provision_Service_cache extends Provision_Service
+{
+}
+
+/**
+ *
+ */
+class Provision_Service_load extends Provision_Service
 {
 }
 
@@ -66,7 +73,7 @@ class Provision_Service_docker_compose extends Provision_Service_docker {
       }
     }
     else {
-      return drush_set_error('DOCKER_MISSING_HOSTMASTER_CONTAINER_ID', dt('The container ID for hostmaster is unknown. Check Hosting Settings.'));
+      return drush_log(dt('The container ID for hostmaster is unknown, so we cannot link it to the database. Check Hosting Settings or save the option "hostmaster_container_id" to drushrc.php.'), 'warning');
     }
   }
   
