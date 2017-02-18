@@ -37,10 +37,42 @@ class hostingService_db_mysql_docker extends hostingService_db_mysql {
   public $name = 'MySQL on Docker';
   public $has_restart_cmd = FALSE;
   
+  function default_port()
+  {
+    return 0;
+  }
+  
   function form(&$form)
   {
     parent::form($form);
     $form['port']['#description'] = t('Internally, the MySQL container always listens on port 3306. Enter the port on the host that will be mapped to port 3306 in the container. Set to "0" to not expose a port at all. (Recommended, unless you need external access.))');
+    
+    // Form username to root.
+    $form['db_user'] = array(
+      '#type' => 'value',
+      '#value' => 'root',
+    );
+    
+    // Force username to root.
+    $form['db_user_item'] = array(
+      '#type' => 'item',
+      '#title' => t('Username'),
+      '#markup' => 'root',
+      '#description' => t('Database container user is always root.'),
+    );
+    
+    // Force password to random.
+    $form['db_passwd'] = array(
+      '#type' => 'value',
+      '#value' => user_password(32),
+    );
+  
+    $form['db_pass_item'] = array(
+      '#type' => 'item',
+      '#title' => t('Password'),
+      '#markup' => 'Automatically generated.',
+      '#description' => t('Database password is generated.'),
+    );
   }
   
   
