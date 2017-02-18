@@ -91,7 +91,7 @@ class Provision_Service_http_apache_docker extends Provision_Service_http_apache
    */
   function getEnvironment() {
     $environment = array();
-    $environment['AEGIR_SERVER_NAME'] = ltrim(d()->name, '@server_');
+    $environment['AEGIR_SERVER_NAME'] = strtr(d()->name, array('@server_' => ''));
     
     if (d()->service('http')->docker_service) {
       $environment = array_merge($environment, d()->service('http')->environment());
