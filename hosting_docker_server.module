@@ -11,7 +11,7 @@ function hosting_docker_server_hosting_service() {
   return array(
     'apache_docker' => 'http',
     'mysql_docker' => 'db',
-    'varnish' => 'cache',
+//    'varnish' => 'cache',
   );
 }
 
@@ -22,9 +22,9 @@ function hosting_docker_server_hosting_service() {
  */
 function hosting_docker_server_hosting_service_type() {
   return array(
-    'cache' => array(
-      'title' => t('Cache'),
-    ),
+//    'cache' => array(
+//      'title' => t('Cache'),
+//    ),
   );
 }
 
