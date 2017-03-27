@@ -45,7 +45,7 @@ class hostingService_db_mysql_docker extends hostingService_db_mysql {
   function form(&$form)
   {
     parent::form($form);
-    $form['port']['#description'] = t('Internally, the MySQL container always listens on port 3306. Enter the port on the host that will be mapped to port 3306 in the container. Set to "0" to not expose a port at all. (Recommended, unless you need external access.))');
+    $form['port']['#description'] = t('Internally, the MySQL container always listens on port 3306. Enter the port on the host that will be mapped to port 3306 in the container. Set to "0" to not expose a port at all. (Recommended, unless you need external access.)');
     
     // Form username to root.
     $form['db_user'] = array(
