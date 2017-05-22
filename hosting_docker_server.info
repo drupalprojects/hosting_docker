@@ -1,5 +1,5 @@
-name = Docker Servers
-description = Allow hostmaster to deploy docker servers.
+name = Aegir Docker Services
+description = Allow hostmaster to deploy sites to Docker-based services..
 package = Hosting
 dependencies[] = hosting
 
