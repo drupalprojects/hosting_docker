@@ -63,15 +63,19 @@ class Provision_Service_docker_compose extends Provision_Service_docker {
       // Check if container is already on the network.
       $host = gethostbyname($container_name);
       if ($host && $host != $container_name && $host != '127.0.0.1') {
-        drush_log(dt('Container !container reached via IP (!host) from hostmaster.', array(
-          '!host' => $host,
-          '!container' => $container_name,
-        )), 'devshop_log');
+        drush_log(dt('Network already detected...'), 'ok');
       }
       // If not, add it to the network!
       else {
+        drush_log(dt('Unable to reach container from Hostmaster. Connecting it to the network...'), 'ok');
         $this->runProcess("docker network connect {$network_name} {$container_id}", d()->config_path);
       }
+  
+      $host = gethostbyname($container_name);
+      drush_log(dt('Hostmaster Container detected an IP of !host for !container.', array(
+        '!host' => $host,
+        '!container' => $container_name,
+      )), 'devshop_log');
     }
     else {
       return drush_log(dt('The container ID for hostmaster is unknown, so we cannot link it to the database. Check Hosting Settings or save the option "hostmaster_container_id" to drushrc.php.'), 'warning');
