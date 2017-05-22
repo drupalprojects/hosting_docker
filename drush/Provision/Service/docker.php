@@ -62,10 +62,11 @@ class Provision_Service_docker_compose extends Provision_Service_docker {
       
       // Check if container is already on the network.
       $host = gethostbyname($container_name);
-      if ($host && $host != $container_name) {
-        drush_log(dt('Connected to database container (!host) from hostmaster.', array(
+      if ($host && $host != $container_name && $host != '127.0.0.1') {
+        drush_log(dt('Container !container reached via IP (!host) from hostmaster.', array(
           '!host' => $host,
-        )), 'ok');
+          '!container' => $container_name,
+        )), 'devshop_log');
       }
       // If not, add it to the network!
       else {
