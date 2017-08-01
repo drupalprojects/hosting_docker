@@ -30,7 +30,7 @@ class Provision_Service_docker_compose extends Provision_Service_docker {
     parent::init_server();
     
     // Detect if this server is using any docker services, then we load the config file.
-    if (d()->type == 'server' && d()->name != 'self') {
+    if (d()->type == 'server' && d()->name != '@self') {
       foreach (d()->get_services() as $service_name => $server) {
         if (isset(d()->service($service_name)->docker_service) && d()->service($service_name)->docker_service) {
           $this->server->remote_host = 'localhost';
