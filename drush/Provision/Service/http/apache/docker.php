@@ -26,9 +26,39 @@ class Provision_Service_http_apache_docker extends Provision_Service_http_apache
   }
   
   function environment() {
+    
+    // Load all sites on this server.
+    $sites = $this->getSites();
     return array(
       'AEGIR_DOCKER' => 1,
+      'VIRTUAL_HOST' => implode(',', $sites),
     );
+  }
+
+  function getSites() {
+  
+    // Get a list of all that use this platform.
+    $aliases_files = _drush_sitealias_find_alias_files();
+    $aliases = array();
+    foreach ($aliases_files as $filename) {
+      if ((@include $filename) === FALSE) {
+        drush_log(dt('Cannot open alias file "!alias", ignoring.', array('!alias' => realpath($filename))), LogLevel::BOOTSTRAP);
+        continue;
+      }
+    }
+    $platforms = array();
+    $platforms_on_this_server = array();
+    $sites_on_this_server = array();
+    
+    foreach ($aliases as $alias_name => $alias) {
+      if (isset($alias['context_type']) && $alias['context_type'] == 'site') {
+        $sites[$alias_name] = $alias;
+        if (d($alias_name)->platform->web_server->name == d()->name) {
+          $sites_on_this_server[] = d($alias_name)->uri;
+        }
+      }
+    }
+    return $sites_on_this_server;
   }
   
   
