@@ -96,7 +96,7 @@ class hostingService_db_mysql_docker extends hostingService_db_mysql {
   public function context_options($task_type, $ref_type, &$task) {
     parent::context_options($task_type, $ref_type, $task);
   
-    $container_name = "server{$this->server->title}_db_1";
+    $container_name = preg_replace("/[^A-Za-z0-9_ ]/", '', "server{$this->server->title}_db_1");
     
     // Provide context_options for verification and writing out to an alias
     $task->context_options['master_db'] = 'mysql' . '://' . urlencode($this->db_user) . ':' . urlencode($this->db_passwd) . '@' . $container_name;
