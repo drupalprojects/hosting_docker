@@ -40,7 +40,7 @@ class DumperTest extends \PHPUnit_Framework_TestCase
     {
         $this->parser = new Parser();
         $this->dumper = new Dumper();
-        $this->path = __DIR__.'/Fixtures';
+        $this->path = __DIR__ . '/Fixtures';
     }
 
     protected function tearDown()
@@ -279,7 +279,7 @@ EOF;
 
     public function testBinaryDataIsDumpedBase64Encoded()
     {
-        $binaryData = file_get_contents(__DIR__.'/Fixtures/arrow.gif');
+        $binaryData = file_get_contents(__DIR__ . '/Fixtures/arrow.gif');
         $expected = '{ data: !!binary '.base64_encode($binaryData).' }';
 
         $this->assertSame($expected, $this->dumper->dump(array('data' => $binaryData)));
@@ -342,7 +342,7 @@ EOF;
             ),
         );
 
-        $this->assertSame(file_get_contents(__DIR__.'/Fixtures/multiple_lines_as_literal_block.yml'), $this->dumper->dump($data, 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
+        $this->assertSame(file_get_contents(__DIR__ . '/Fixtures/multiple_lines_as_literal_block.yml'), $this->dumper->dump($data, 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
     }
 
     /**

@@ -17,11 +17,11 @@ class ComposerStaticInit39a4171768321eabf3da43ffd02c039a
     public static $prefixDirsPsr4 = array (
         'Symfony\\Component\\Yaml\\' => 
         array (
-            0 => __DIR__ . '/..' . '/symfony/yaml',
+            0 => __DIR__ . '/vendor',
         ),
         'Symfony\\Component\\Process\\' => 
         array (
-            0 => __DIR__ . '/..' . '/symfony/process',
+            0 => __DIR__ . '/vendor',
         ),
     );
 

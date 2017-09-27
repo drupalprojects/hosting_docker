@@ -60,7 +60,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
     public function getDataFormSpecifications()
     {
         $parser = new Parser();
-        $path = __DIR__.'/Fixtures';
+        $path = __DIR__ . '/Fixtures';
 
         $tests = array();
         $files = $parser->parse(file_get_contents($path.'/index.yml'));
