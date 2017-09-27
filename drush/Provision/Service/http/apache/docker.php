@@ -116,9 +116,12 @@ class Provision_Service_http_apache_docker extends Provision_Service_http_apache
         '/var/aegir' => $_SERVER['HOST_AEGIR_HOME']
       ));
     }
-    
+  
     $volumes[] = "{$config_path_host}:{$config_path_container}:z";
-    $volumes[] = "{$platforms_path_host}:{$platforms_path_container}:z";
+  
+    if (!empty($platforms_path_host) && !empty($platforms_path_container)) {
+      $volumes[] = "{$platforms_path_host}:{$platforms_path_container}:z";
+    }
     
     return $volumes;
   }
