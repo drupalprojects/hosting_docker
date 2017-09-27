@@ -21,6 +21,14 @@ class Provision_Service_http_apache_docker extends Provision_Service_http_apache
     return "";
   }
   
+  /**
+   * Lock internal http port at 80.
+   * @See Provision_Service_http_public::init_server()
+   */
+  function init_server() {
+    $this->server->setProperty('http_port', '80');
+  }
+  
   function verify_server_cmd() {
     parent::verify_server_cmd();
   }
