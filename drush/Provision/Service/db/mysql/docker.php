@@ -14,6 +14,11 @@ class Provision_Service_db_mysql_docker extends Provision_Service_db_mysql {
   public $docker_service = TRUE;
   public $docker_image = 'mariadb';
   
+  function init_server() {
+    parent::init_server();
+    $this->server->setProperty('db_grant_all_hosts', TRUE);
+  }
+  
   function environment() {
     return array(
       // MariaDB image does not have a MYSQL_ROOT_USER environment variable.
