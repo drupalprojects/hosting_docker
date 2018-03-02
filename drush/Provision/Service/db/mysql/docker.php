@@ -67,6 +67,7 @@ class Provision_Service_db_mysql_docker extends Provision_Service_db_mysql {
     while (strpos($output, 'mysqld is alive') === FALSE) {
       sleep(3);
       drush_log('Waiting for DB container...', 'devshop_log');
+      drush_log(dt('Running %cmd', ['cmd' => $cmd]), 'debug');
       drush_shell_cd_and_exec(d()->config_path, $cmd);
       $output = trim(implode("\n", drush_shell_exec_output()));
       drush_log($output, 'debug');
@@ -85,7 +86,7 @@ class Provision_Service_db_mysql_docker extends Provision_Service_db_mysql {
       // See https://www.drupal.org/node/2754539
       'command' => 'mysqld --innodb-large-prefix --innodb-file-format=barracuda --innodb-file-per-table',
     );
-    
+
     // if the user entered no port, don't add ports array. If we do, a random public port is assigned.
     // We don't typically want this for db servers.
     if (!empty(d()->db_port)) {
