@@ -12,7 +12,12 @@ class Provision_Service_http_apache_docker extends Provision_Service_http_apache
   
   public $docker_service = TRUE;
   public $docker_image = 'aegir/web';
-  
+
+  /**
+   * @var string Container Aegir root is static because it's fixed inside the container.
+   */
+  static $CONTAINER_AEGIR_ROOT = '/var/aegir';
+
   /**
    * This is passed to the `docker run` command. If you leave it blank, a random port will be assigned by docker, as we will save it.
    * @return string
@@ -105,26 +110,33 @@ class Provision_Service_http_apache_docker extends Provision_Service_http_apache
    */
   function getVolumes() {
     $volumes = array();
-    
-    $config_path_host = $config_path_container = d()->config_path;
-    $platforms_path_host = $platforms_path_container = d()->http_platforms_path;
-    
+
+    // Set server config path as a volume.
+    $config_path_host = d()->config_path;
     if (isset($_SERVER['HOST_AEGIR_HOME'])) {
       $config_path_host = strtr($config_path_host, array(
         '/var/aegir' => $_SERVER['HOST_AEGIR_HOME']
       ));
-      $platforms_path_host = strtr($platforms_path_host, array(
-        '/var/aegir' => $_SERVER['HOST_AEGIR_HOME']
-      ));
     }
-  
-    $volumes[] = "{$config_path_host}:{$config_path_container}:z";
-  
-    if (!empty($platforms_path_host) && !empty($platforms_path_container)) {
-      $volumes[] = "{$platforms_path_host}:{$platforms_path_container}:z";
+    $server_name = ltrim(d()->name, '@');
+    $volumes[] = "{$config_path_host}:{$this::$CONTAINER_AEGIR_ROOT}/config/{$server_name}:z";
+
+    // Map a volume for every platform.
+    $aliases = _drush_sitealias_all_list();
+    foreach ($aliases as $context) {
+      if ($context['context_type'] == 'platform' && $context['web_server'] == d()->name) {
+
+        $volume_path_container = empty($context['repo_root'])? $context['root']: $context['repo_root'];
+        $volume_path_host = strtr($volume_path_container, array(
+            '/var/aegir' => $_SERVER['HOST_AEGIR_HOME']
+        ));
+
+        // Use the container path as the key so we don't get duplicate volumes at the same path.
+        $volumes[$volume_path_container] = $volume_path_host . ':' . $volume_path_container . ':z';
+      }
     }
     
-    return $volumes;
+    return array_values($volumes);
   }
   
   /**
