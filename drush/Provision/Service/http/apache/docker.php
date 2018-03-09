@@ -18,6 +18,12 @@ class Provision_Service_http_apache_docker extends Provision_Service_http_apache
    */
   static $CONTAINER_AEGIR_ROOT = '/var/aegir';
 
+  function default_restart_cmd() {
+    $command = parent::default_restart_cmd();
+    $default_restart_cmd = "docker-compose -f {$this->server->config_path}/docker-compose.yml exec -T http {$command}";
+    return $default_restart_cmd;
+  }
+
   /**
    * This is passed to the `docker run` command. If you leave it blank, a random port will be assigned by docker, as we will save it.
    * @return string
@@ -28,10 +34,13 @@ class Provision_Service_http_apache_docker extends Provision_Service_http_apache
   
   /**
    * Lock internal http port at 80.
+   * Lock http_restart_cmd to self::default_restart_cmd()
+   *
    * @See Provision_Service_http_public::init_server()
    */
   function init_server() {
     $this->server->setProperty('http_port', '80');
+    $this->server->setProperty('http_restart_cmd', $this->default_restart_cmd());
     parent::init_server();
   }
   
