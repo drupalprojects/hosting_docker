@@ -51,3 +51,13 @@ function hosting_docker_server_hosting_server_context_options(&$task)
 {
   $task->options['hostmaster_container_id'] = variable_get('hostmaster_container_id', NULL);
 }
+
+/**
+ * Implements hook_hosting_TASK_OBJECT_context_options().
+ *
+ * Load hostmaster container ID variable into drush options for server contexts.
+ */
+function hosting_docker_server_hosting_site_context_options(&$task)
+{
+  $task->options['hostmaster_container_id'] = variable_get('hostmaster_container_id', NULL);
+}
