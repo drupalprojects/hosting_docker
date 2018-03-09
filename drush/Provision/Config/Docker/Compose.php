@@ -12,7 +12,7 @@ class Provision_Config_Docker_Compose extends Provision_Config
   
   function filename()
   {
-    return d()->docker_compose_path;
+    return $this->context->config_path . '/docker-compose.yml';
   }
   
   /**
@@ -23,21 +23,22 @@ class Provision_Config_Docker_Compose extends Provision_Config
    */
   function __construct($context, $data = array())
   {
+    $this->context = is_object($context) ? $context : d($context);
     $data['compose'] = $this->getDockerCompose();
-    $data['server_name'] = ltrim($this->data['server']->name, '@server_');
+    $data['server_name'] = ltrim($this->context->name, '@server_');
     parent::__construct($context, $data);
   }
   
   function getDockerCompose()
   {
-    $server_name = ltrim(d()->name, '@server_');
+    $server_name = ltrim($this->context->name, '@server_');
     $compose = array(
       'version' => '2',
     );
     
-    foreach (d()->get_services() as $service => $server) {
-      if (method_exists(d()->service($service), 'dockerComposeService')) {
-        $compose['services'][$service] = d()->service($service)->dockerComposeService();
+    foreach ($this->context->get_services() as $service => $server) {
+      if (method_exists($this->context->service($service), 'dockerComposeService')) {
+        $compose['services'][$service] = $this->context->service($service)->dockerComposeService();
         $compose['services'][$service]['hostname'] = "{$server_name}.{$service}";
       }
     }
