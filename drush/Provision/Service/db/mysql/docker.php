@@ -154,4 +154,12 @@ class Provision_Service_db_mysql_docker extends Provision_Service_db_mysql {
     $creds['db_host'] = drush_set_option('db_host', 'db', 'site');
     return $creds;
   }
+
+  /**
+   * Override Provision_Service_db_mysql::utf8mb4_is_supported() to always return true. We set this in dockerComposeService()
+   * @return bool
+   */
+  function utf8mb4_is_supported() {
+    return TRUE;
+  }
 }
