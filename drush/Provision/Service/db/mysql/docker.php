@@ -57,7 +57,7 @@ class Provision_Service_db_mysql_docker extends Provision_Service_db_mysql {
     
     // Find the container prefix by removing all non-alphanumeric characters
     $container_prefix = preg_replace("/[^A-Za-z0-9 ]/", '', $this->server->name);
-    $cmd = "docker exec {$container_prefix}_http_1 mysqladmin ping -h {$host} -u {$user} --password={$password}";
+    $cmd = "docker-compose exec -T http mysqladmin ping -h {$host} -u {$user} --password={$password}";
 
     // Run mysqladmin ping from the web container.
     // @TODO: Think about a good way to network all DB containers to the hostmaster container so Aegir can use core methods to connect.
