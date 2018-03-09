@@ -31,13 +31,21 @@ function docker_provision_services() {
   );
 }
 
+
+/**
+ * Implements drush_hook_pre_COMMAND()
+ * Run pre-verify on the docker compose service.
+ */
+function drush_docker_pre_provision_install () {
+  drush_docker_pre_provision_verify();
+}
+
 /**
  * Implements drush_hook_pre_COMMAND()
  * Run pre-verify on the docker compose service.
  */
 function drush_docker_pre_provision_verify () {
-  
-  if (d()->type == 'server' && _server_has_docker_services()) {
+  if ((d()->type == 'server' || d()->type == 'site') && _server_has_docker_services()) {
     $service = new Provision_Service_docker_compose(d());
     $service->pre_verify_server_cmd();
   }

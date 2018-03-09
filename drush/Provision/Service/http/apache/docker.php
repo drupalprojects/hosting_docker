@@ -67,7 +67,7 @@ class Provision_Service_http_apache_docker extends Provision_Service_http_apache
     foreach ($aliases as $alias_name => $alias) {
       if (isset($alias['context_type']) && $alias['context_type'] == 'site') {
         $sites[$alias_name] = $alias;
-        if (d($alias_name)->platform->web_server->name == d()->name) {
+        if (d($alias_name)->platform->web_server->name == $this->server->name) {
           $sites_on_this_server[] = d($alias_name)->uri;
         }
       }
@@ -83,7 +83,7 @@ class Provision_Service_http_apache_docker extends Provision_Service_http_apache
   }
   
   function dockerComposeService() {
-    $ports = empty(d()->http_port)? '80': d()->http_port . ':80' ;
+    $ports = empty($this->server->http_port)? '80': $this->server->http_port . ':80' ;
 
     $compose = array(
         'image'  => $this->docker_image,
@@ -112,19 +112,19 @@ class Provision_Service_http_apache_docker extends Provision_Service_http_apache
     $volumes = array();
 
     // Set server config path as a volume.
-    $config_path_host = d()->config_path;
+    $config_path_host = $this->server->config_path;
     if (isset($_SERVER['HOST_AEGIR_HOME'])) {
       $config_path_host = strtr($config_path_host, array(
         '/var/aegir' => $_SERVER['HOST_AEGIR_HOME']
       ));
     }
-    $server_name = ltrim(d()->name, '@');
+    $server_name = ltrim($this->server->name, '@');
     $volumes[] = "{$config_path_host}:{$this::$CONTAINER_AEGIR_ROOT}/config/{$server_name}:z";
 
     // Map a volume for every platform.
     $aliases = _drush_sitealias_all_list();
     foreach ($aliases as $context) {
-      if ($context['context_type'] == 'platform' && $context['web_server'] == d()->name) {
+      if ($context['context_type'] == 'platform' && $context['web_server'] == $this->server->name) {
 
         $volume_path_container = empty($context['repo_root'])? $context['root']: $context['repo_root'];
         $volume_path_host = strtr($volume_path_container, array(
@@ -145,15 +145,14 @@ class Provision_Service_http_apache_docker extends Provision_Service_http_apache
    */
   function getEnvironment() {
     $environment = array();
-    $environment['AEGIR_SERVER_NAME'] = strtr(d()->name, array('@server_' => ''));
+    $environment['AEGIR_SERVER_NAME'] = strtr($this->server->name, array('@server_' => ''));
     
-    if (d()->service('http')->docker_service) {
-      $environment = array_merge($environment, d()->service('http')->environment());
+    if ($this->server->service('http')->docker_service) {
+      $environment = array_merge($environment, $this->server->service('http')->environment());
     }
-    if (d()->service('db')->docker_service) {
-      $environment = array_merge($environment, d()->service('db')->environment());
+    if ($this->server->service('db')->docker_service) {
+      $environment = array_merge($environment, $this->server->service('db')->environment());
     }
     return $environment;
   }
-  
 }

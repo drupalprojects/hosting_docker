@@ -46,17 +46,25 @@ class Provision_Service_docker_compose extends Provision_Service_docker {
    */
   function pre_verify_server_cmd()
   {
+    // Use either $this or if a site, platform's web server
+    if (d()->type == 'server') {
+      $server = d();
+    }
+    elseif (d()->type == 'site') {
+      $server = d()->platform->web_server;
+    }
+
     // Write docker-compose.yml file.
-    $config = new Provision_Config_Docker_Compose(d());
+    $config = new Provision_Config_Docker_Compose($server);
     $config->write();
 
     // Run docker-compose up -d
-    drush_log("Running docker-compose in " . d()->config_path, "devshop_log");
-    $this->runProcess('docker-compose up -d', d()->config_path);
+    drush_log("Running docker-compose in " . $server->config_path, "devshop_log");
+    $this->runProcess('docker-compose up -d', $server->config_path);
     
     // If hostmaster container is known, add it to the network.
     if ($container_id = drush_get_option('hostmaster_container_id')) {
-      $container_prefix = preg_replace("/[^A-Za-z0-9 ]/", '', $this->server->name);
+      $container_prefix = preg_replace("/[^A-Za-z0-9 ]/", '', $server->name);
       $container_name = "{$container_prefix}_db_1";
       $network_name = "{$container_prefix}_default";
       
@@ -68,7 +76,7 @@ class Provision_Service_docker_compose extends Provision_Service_docker {
       // If not, add it to the network!
       else {
         drush_log(dt('Unable to reach container from Hostmaster. Connecting it to the network...'), 'ok');
-        $this->runProcess("docker network connect {$network_name} {$container_id}", d()->config_path);
+        $this->runProcess("docker network connect {$network_name} {$container_id}", $server->config_path);
       }
   
       $host = gethostbyname($container_name);
