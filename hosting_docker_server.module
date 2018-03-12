@@ -24,7 +24,7 @@ function hosting_docker_server_menu() {
  *
  */
 function hosting_docker_node_docker_page_access($node) {
-  return user_access('access docker server information') && node_access('view', $node);
+  return user_access('access docker server information') && isset($node->docker) && node_access('view', $node);
 }
 
 /**
