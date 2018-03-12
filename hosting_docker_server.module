@@ -5,6 +5,42 @@
  */
 
 /**
+ * Implements hook_menu().
+ */
+function hosting_docker_server_menu() {
+  $items['node/%node/docker'] = array(
+    'access callback' => 'hosting_docker_node_docker_page_access',
+    'access arguments' => array(1),
+    'page callback' => 'hosting_docker_node_docker_page',
+    'page arguments' => array(1),
+    'title' => 'Docker',
+    'file' => 'hosting_docker_server.pages.inc',
+    'type' => MENU_LOCAL_TASK,
+  );
+  return $items;
+}
+
+/**
+ *
+ */
+function hosting_docker_node_docker_page_access($node) {
+  return user_access('access docker server information') && node_access('view', $node);
+}
+
+/**
+ * Implements hook_permission().
+ */
+function hosting_docker_server_permission() {
+  return array(
+    'access docker server information' => array(
+      'title' => 'Access docker server information',
+      'description' => 'Access the docker information for Server nodes, such as the path to docker-compose.yml',
+      'warning' => 'WARNING: This currently exposes the full docker-compose.yml file. It includes the MySQL Root password. Grant this permission only to those who you trust with the root password.'
+    )
+  );
+}
+
+/**
  * Implements hook_hosting_service().
  */
 function hosting_docker_server_hosting_service() {
@@ -26,6 +62,34 @@ function hosting_docker_server_hosting_service_type() {
 //      'title' => t('Cache'),
 //    ),
   );
+}
+
+/**
+ * Implements hook_node_load().
+ */
+function hosting_docker_server_node_load($nodes, $types) {
+  if (in_array('server', $types)) {
+    foreach ($nodes as $node) {
+      if (hosting_docker_server_has_docker_services($node)) {
+        $node->docker = array(
+          'docker-compose-file' => "/var/aegir/config/{$node->hosting_name}/docker-compose.yml",
+        );
+      }
+    }
+  }
+}
+
+/**
+ * Loop through services to see if any of them are docker services.
+ */
+function hosting_docker_server_has_docker_services($node) {
+
+  // Detect if this server is using any docker services return TRUE;
+  foreach ($node->services as $service_name => $service) {
+    if (property_exists($service,'DOCKER_SERVICE')) {
+      return TRUE;
+    }
+  }
 }
 
 /**

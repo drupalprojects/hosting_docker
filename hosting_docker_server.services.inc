@@ -10,7 +10,16 @@ module_load_include('service.inc', 'hosting_db_server');
 class hostingService_http_apache_docker extends hostingService_http_apache {
   public $type = 'apache_docker';
   public $name = 'Apache on Docker';
-  
+
+  /**
+   * Currently used to tell hosting_docker_server_has_docker_services() that this
+   * is a docker service. Eventually replace this with an interface, like in
+   * Provision 4.x.
+   *
+   * @var bool
+   */
+  static $DOCKER_SERVICE = TRUE;
+
   // It does but we don't let the user edit it.
   public $has_restart_cmd = FALSE;
   
@@ -36,7 +45,9 @@ class hostingService_db_mysql_docker extends hostingService_db_mysql {
   public $type = 'mysql_docker';
   public $name = 'MySQL on Docker';
   public $has_restart_cmd = FALSE;
-  
+
+  static $DOCKER_SERVICE = TRUE;
+
   function default_port()
   {
     return 0;
