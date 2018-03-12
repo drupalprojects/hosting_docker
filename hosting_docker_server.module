@@ -47,6 +47,7 @@ function hosting_docker_server_hosting_service() {
   return array(
     'apache_docker' => 'http',
     'mysql_docker' => 'db',
+    'https_docker' => 'load',
 //    'varnish' => 'cache',
   );
 }
@@ -58,6 +59,9 @@ function hosting_docker_server_hosting_service() {
  */
 function hosting_docker_server_hosting_service_type() {
   return array(
+    'load' => array(
+      'title' => t('Load Balancer'),
+    ),
 //    'cache' => array(
 //      'title' => t('Cache'),
 //    ),

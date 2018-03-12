@@ -41,6 +41,11 @@ class Provision_Config_Docker_Compose extends Provision_Config
         $compose['services'][$service] = $this->context->service($service)->dockerComposeService();
         $compose['services'][$service]['hostname'] = "{$server_name}.{$service}";
       }
+      if (method_exists($this->context->service($service), 'dockerComposeServices')) {
+        foreach ($this->context->service($service)->dockerComposeServices() as $sub_service_name => $sub_service) {
+          $compose['services'][$sub_service_name] = $sub_service;
+        }
+      }
     }
     
     // For now, link every service. to http
