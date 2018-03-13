@@ -56,8 +56,15 @@ class Provision_Config_Docker_Compose extends Provision_Config
         }
       }
     }
-    
-    return $compose;
+
+    // Allow services to alter the final docker compose array.
+    foreach ($this->context->get_services() as $service => $server) {
+      if (method_exists($this->context->service($service), 'dockerComposeAlter')) {
+        $this->context->service($service)->dockerComposeAlter($compose);
+      }
+    }
+
+      return $compose;
   }
   
   /**

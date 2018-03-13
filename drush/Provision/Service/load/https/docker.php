@@ -63,4 +63,11 @@ YML;
     return $compose_services;
 
   }
+
+  /**
+   * @param $compose
+   */
+  function dockerComposeAlter(&$compose) {
+    $compose['networks']['default']['external']['name'] = 'nginx-proxy';
+  }
 }
