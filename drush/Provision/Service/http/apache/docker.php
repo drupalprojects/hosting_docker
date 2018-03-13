@@ -135,7 +135,7 @@ class Provision_Service_http_apache_docker extends Provision_Service_http_apache
     foreach ($aliases as $context) {
       if ($context['context_type'] == 'platform' && $context['web_server'] == $this->server->name) {
 
-        $volume_path_container = empty($context['repo_root'])? $context['root']: $context['repo_root'];
+        $volume_path_container = empty($context['repo_path'])? $context['root']: $context['repo_path'];
         $volume_path_host = strtr($volume_path_container, array(
             '/var/aegir' => $_SERVER['HOST_AEGIR_HOME']
         ));
