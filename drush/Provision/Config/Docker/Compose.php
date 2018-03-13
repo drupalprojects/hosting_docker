@@ -35,38 +35,32 @@ class Provision_Config_Docker_Compose extends Provision_Config
     $compose = array(
       'version' => '2',
     );
-    
-    foreach ($this->context->get_services() as $service => $server) {
-      if (method_exists($this->context->service($service), 'dockerComposeService')) {
-        $compose['services'][$service] = $this->context->service($service)->dockerComposeService();
+
+    // Invoke dockerComposeService() on each Service class.
+    foreach ($this->context->services_invoke('dockerComposeService') as $service => $compose_service) {
+      if ($compose_service) {
+        $compose['services'][$service] = $compose_service;
         $compose['services'][$service]['hostname'] = "{$server_name}.{$service}";
       }
-      if (method_exists($this->context->service($service), 'dockerComposeServices')) {
-        foreach ($this->context->service($service)->dockerComposeServices() as $sub_service_name => $sub_service) {
-          $compose['services'][$sub_service_name] = $sub_service;
-        }
-      }
     }
-    
-    // For now, link every service. to http
-    if (isset($compose['services']['http'])) {
-      foreach ($compose['services'] as $service => $data) {
-        if ($service != 'http' && $service != 'cache') {
-          $compose['services']['http']['links'][] = $service;
+
+    // Invoke dockerComposeServices() on each Service class.
+    foreach ($this->context->services_invoke('dockerComposeServices') as $service => $compose_services) {
+      if ($compose_services) {
+        foreach ($compose_services as $sub_service => $compose_service) {
+          $compose['services'][$sub_service] = $compose_service;
+          $compose['services'][$sub_service]['hostname'] = "{$server_name}.{$service}";
         }
       }
     }
 
-    // Allow services to alter the final docker compose array.
-    foreach ($this->context->get_services() as $service => $server) {
-      if (method_exists($this->context->service($service), 'dockerComposeAlter')) {
-        $this->context->service($service)->dockerComposeAlter($compose);
-      }
-    }
+    // Allow all services to alter the final docker compose array.
+    // @TODO: Replace with a services_invoke_all() method, and move the network alter to
+    $this->context->services_invoke('dockerComposeAlter', [&$compose]);
 
-      return $compose;
+    return $compose;
   }
-  
+
   /**
    * This is needed until we patch Provision_Context to be able to write files directly.
    *
