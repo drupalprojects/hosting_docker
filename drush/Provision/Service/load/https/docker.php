@@ -15,6 +15,14 @@ class Provision_Service_load_https_docker extends Provision_Service {
 
   function dockerComposeServices() {
     $default_host_uri = $this->server->name;
+
+    $volumes_path = $this->server->config_path . '/volumes';
+    if (isset($_SERVER['HOST_AEGIR_HOME'])) {
+      $volumes_path = strtr($volumes_path, [
+        '/var/aegir' => $_SERVER['HOST_AEGIR_HOME']
+      ]);
+    }
+
     $yml = <<<YML
 nginx:
   restart: always
@@ -24,18 +32,18 @@ nginx:
     - "80:80"
     - "443:443"
   volumes:
-    - "./volumes/proxy/conf.d:/etc/nginx/conf.d"
+    - "$volumes_path/proxy/conf.d:/etc/nginx/conf.d"
     - "/etc/nginx/vhost.d"
     - "/usr/share/nginx/html"
-    - "./volumes/proxy/certs:/etc/nginx/certs:ro"
+    - "$volumes_path/proxy/certs:/etc/nginx/certs:ro"
 
 nginx-gen:
   restart: always
   image: jwilder/docker-gen
   container_name: nginx-gen
   volumes:
-    - "/var/run/docker.sock:/tmp/docker.sock:ro"
-    - "./volumes/proxy/templates/nginx.tmpl:/etc/docker-gen/templates/nginx.tmpl:ro"
+    - "/var/run/docker.sock:/tmp/docker.sock"
+    - "$volumes_path/proxy/templates:/etc/docker-gen/templates:ro"
   volumes_from:
     - nginx
   entrypoint: /usr/local/bin/docker-gen -notify-sighup nginx -watch -wait 5s:30s /etc/docker-gen/templates/nginx.tmpl /etc/nginx/conf.d/default.conf
@@ -50,24 +58,12 @@ letsencrypt-nginx-proxy-companion:
     - nginx
   volumes:
     - "/var/run/docker.sock:/var/run/docker.sock:ro"
-    - "./volumes/proxy/certs:/etc/nginx/certs:rw"
+    - "$volumes_path/proxy/certs:/etc/nginx/certs:rw"
   environment:
     - NGINX_DOCKER_GEN_CONTAINER=nginx-gen
-  networks:
-default:
-  external:
-  name: nginx-proxy
 YML;
 
     $compose_services = Yaml::parse($yml);
     return $compose_services;
-
-  }
-
-  /**
-   * @param $compose
-   */
-  function dockerComposeAlter(&$compose) {
-    $compose['networks']['default']['external']['name'] = 'nginx-proxy';
   }
 }

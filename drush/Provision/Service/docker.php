@@ -167,4 +167,11 @@ class Provision_Service_docker_compose extends Provision_Service_docker {
     }
     return $process->getOutput();
   }
+
+  /**
+   * @param $compose
+   */
+  static function dockerComposeAlter(&$compose) {
+    $compose['networks']['default']['external']['name'] = 'nginx-proxy';
+  }
 }
