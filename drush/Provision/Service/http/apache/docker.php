@@ -164,4 +164,18 @@ class Provision_Service_http_apache_docker extends Provision_Service_http_apache
     }
     return $environment;
   }
+
+  /**
+   * @inheritdoc
+   */
+  function restart() {
+    // Only attempt to restart if triggering context is a site.
+    if ($this->context->type == 'platform') {
+      return TRUE;
+    }
+    elseif ($this->context->type == 'site') {
+      return parent::restart();
+    }
+  }
+
 }
