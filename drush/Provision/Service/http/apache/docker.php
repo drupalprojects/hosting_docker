@@ -178,4 +178,18 @@ class Provision_Service_http_apache_docker extends Provision_Service_http_apache
     }
   }
 
+  /**
+   * Link the http container to every other container.
+   *
+   * This ensures the web container can always reach other services by name.
+   *
+   * @param $compose
+   */
+  function dockerComposeAlter(&$compose) {
+    foreach ($compose['services'] as $service => $data) {
+      if ($service != 'http' && $service != 'cache') {
+        $compose['services']['http']['links'][] = $service;
+      }
+    }
+  }
 }
