@@ -103,7 +103,10 @@ class Provision_Service_http_apache_docker extends Provision_Service_http_apache
           $ports,
         ),
         'volumes' => $this->getVolumes(),
-        'environment' => $this->getEnvironment()
+        'environment' => $this->getEnvironment(),
+        'env_file' => array(
+          'db_secrets.env',
+        ),
       );
     return $compose;
   }
@@ -160,9 +163,6 @@ class Provision_Service_http_apache_docker extends Provision_Service_http_apache
     
     if ($this->server->service('http')->docker_service) {
       $environment = array_merge($environment, $this->server->service('http')->environment());
-    }
-    if ($this->server->service('db')->docker_service) {
-      $environment = array_merge($environment, $this->server->service('db')->environment());
     }
     return $environment;
   }
