@@ -118,6 +118,10 @@ function hosting_docker_server_form_hosting_settings_alter(&$form, &$form_state,
 function hosting_docker_server_hosting_server_context_options(&$task)
 {
   $task->options['hostmaster_container_id'] = variable_get('hostmaster_container_id', NULL);
+
+  if (isset($task->ref->services['http']->docker_php_version)) {
+    $task->context_options['docker_php_version'] = $task->ref->services['http']->docker_php_version;
+  }
 }
 
 /**

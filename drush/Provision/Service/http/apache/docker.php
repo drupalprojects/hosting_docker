@@ -42,7 +42,7 @@ class Provision_Service_http_apache_docker extends Provision_Service_http_apache
   function init_server() {
     $this->server->setProperty('http_port', '80');
     $this->server->setProperty('http_restart_cmd', $this->default_restart_cmd());
-    $this->server->setProperty('docker_php_version', $this->docker_image_php7);
+    $this->server->setProperty('docker_php_version','5.5');
     parent::init_server();
   }
   
@@ -97,7 +97,7 @@ class Provision_Service_http_apache_docker extends Provision_Service_http_apache
     $ports = empty($this->server->http_port)? '80': $this->server->http_port . ':80' ;
 
     $compose = array(
-        'image'  => $this->server->docker_php_version == '7'? $this->docker_image_php7: $this->docker_image,
+        'image'  => $this->server->docker_php_version == '7.0'? $this->docker_image_php7: $this->docker_image,
         'restart'  => 'on-failure:10',
         'ports'  => array(
           $ports,
