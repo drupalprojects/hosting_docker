@@ -46,7 +46,7 @@ function drush_docker_pre_provision_install () {
  * Run pre-verify on the docker compose service.
  */
 function drush_docker_pre_provision_verify () {
-  if ((d()->type == 'server' || d()->type == 'site') && _server_has_docker_services()) {
+  if ((d()->type == 'server' || d()->type == 'site') && _server_has_docker_services(d())) {
     $service = new Provision_Service_docker_compose(d());
     $service->pre_verify_server_cmd();
   }
@@ -58,7 +58,7 @@ function drush_docker_pre_provision_verify () {
  */
 function drush_docker_pre_provision_delete () {
   
-  if (d()->type == 'server' && _server_has_docker_services()) {
+  if (d()->type == 'server' && _server_has_docker_services(d())) {
     $service = new Provision_Service_docker_compose(d());
     $service->pre_delete_server_cmd();
   }
@@ -67,12 +67,13 @@ function drush_docker_pre_provision_delete () {
 /**
  * Loop through get_services() to see if any of them ar docker services.
  */
-function _server_has_docker_services() {
-  
+function _server_has_docker_services($server) {
   // Detect if this server is using any docker services return TRUE;
-  foreach (d()->get_services() as $service_name => $server) {
-    if (isset(d()->service($service_name)->docker_service) && d()->service($service_name)->docker_service) {
-      return TRUE;
+  if ($server->type == 'server') {
+    foreach ($server->get_services() as $service_name => $service) {
+      if (isset($server->service($service_name)->docker_service) && $server->service($service_name)->docker_service) {
+        return TRUE;
+      }
     }
   }
 }
@@ -89,5 +90,21 @@ function docker_provision_config_variables_alter(&$variables, $template, $config
     
     // Force the listen port to be 80.
     $variables['http_port'] = '80';
+  }
+}
+
+/**
+ * Implements hook_provision_context_alter().
+ *
+ * Replaces server classes with our own class.
+ *
+ * @param $context
+ */
+function docker_provision_context_alter(&$context) {
+  if (_server_has_docker_services($context)) {
+    drush_log(dt('Reloading server context using Docker server: ' . $context->name), 'notice');
+    $context = new Provision_Context_Server_docker($context->name);
+    $context->method_invoke('init');
+    $context->type_invoke('init');
   }
 }
