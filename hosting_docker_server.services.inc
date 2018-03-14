@@ -104,7 +104,7 @@ class hostingService_db_mysql_docker extends hostingService_db_mysql {
     // Force password to random.
     $form['db_passwd'] = array(
       '#type' => 'value',
-      '#value' => user_password(32),
+      '#value' => $this->db_passwd? $this->db_passwd: user_password(32),
     );
   
     $form['db_pass_item'] = array(
