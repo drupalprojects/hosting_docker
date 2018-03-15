@@ -50,9 +50,11 @@ class hostingService_http_apache_docker extends hostingService_http_apache {
    */
   function load() {
     parent::load();
-    $this->setValues(array(
-      'docker_php_version' => variable_get("hosting_docker_server_{$this->server->name}_php_version", '5.5'),
-    ));
+    if ($this->server->name) {
+      $this->setValues(array(
+        'docker_php_version' => variable_get("hosting_docker_server_{$this->server->name}_php_version", '5.5'),
+      ));
+    }
   }
 
   /**
