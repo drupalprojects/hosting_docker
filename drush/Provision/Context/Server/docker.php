@@ -3,11 +3,16 @@
 class Provision_Context_Server_docker extends Provision_Context_server {
 
   function shell_exec($command) {
-    $command = "docker-compose -f {$this->config_path}/docker-compose.yml exec -T http {$command}";
-    drush_log(dt('Passing command to docker-compose.  Full command: !command', array(
-      '!command' => $command,
-    )), 'debug');
-    return drush_shell_exec(escapeshellcmd($command));
+    if (isset($this->service('http')->docker_service)) {
+      $command = "docker-compose -f {$this->config_path}/docker-compose.yml exec -T http {$command}";
+      drush_log(dt('Passing command to docker-compose.  Full command: !command', array(
+        '!command' => $command,
+      )), 'debug');
+      return drush_shell_exec(escapeshellcmd($command));
+    }
+    else {
+      return parent::shell_exec($command);
+    }
   }
 
   function init_server() {
