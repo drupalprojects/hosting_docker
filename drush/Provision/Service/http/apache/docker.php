@@ -11,8 +11,11 @@ class Provision_Service_http_apache_docker extends Provision_Service_http_apache
   protected $has_restart_cmd = TRUE;
   
   public $docker_service = TRUE;
-  public $docker_image = 'aegir/web';
-  public $docker_image_php7 = 'aegir/web:php7';
+  public $docker_images = array(
+    '5.5' => 'aegir/web',
+    '7.0' => 'aegir/web:php7',
+    '7.1' => 'aegir/web:php7.1',
+  );
 
   /**
    * @var string Container Aegir root is static because it's fixed inside the container.
@@ -97,7 +100,9 @@ class Provision_Service_http_apache_docker extends Provision_Service_http_apache
     $ports = empty($this->server->http_port)? '80': $this->server->http_port . ':80' ;
 
     $compose = array(
-        'image'  => $this->server->docker_php_version == '7.0'? $this->docker_image_php7: $this->docker_image,
+        'image'  => isset($this->docker_images[$this->server->docker_php_version])?
+          $this->docker_images[$this->server->docker_php_version]:
+          $this->docker_images['5.5'],
         'restart'  => 'on-failure:10',
         'ports'  => array(
           $ports,
